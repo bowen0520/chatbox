@@ -2,6 +2,7 @@ package chatroom;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -9,6 +10,12 @@ public class MySocket {
     Socket socket;
     BufferedReader bufferedReader;
     PrintWriter printWriter;
+
+    public MySocket(Socket socket) throws IOException {
+        this.socket = socket;
+        this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        this.printWriter = new PrintWriter(socket.getOutputStream());
+    }
 
     public MySocket(Socket socket, BufferedReader bufferedReader, PrintWriter printWriter) {
         this.socket = socket;

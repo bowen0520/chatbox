@@ -8,8 +8,10 @@ public class ClientLunch {
         Scanner scanner = new Scanner(System.in);
         System.out.print("请输入名称：");
         String name = scanner.nextLine();
-        System.out.print("请输入IP：");
-        String IP = scanner.nextLine();
-        return new Thread(new ClientThread(name,IP));
+        System.out.print("请输入服务器ip：");
+        String serverIP = scanner.nextLine();
+        System.out.print("请输入ports：");
+        String[] ports = scanner.nextLine().split(" ");
+        return new Thread(new ClientThread(name,serverIP,ports));
     }
 }

@@ -1,114 +1,56 @@
 package chatroom;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JTextArea;
+import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Map;
+import java.util.List;
 
-public class ClientFrame extends JFrame {
-    private JTextArea inputBox;
-    private JTextArea outputBox;
-    private JButton out;
-    private int high;
-    private int wide;
-
+public class ClientFrame extends MyFrame {
     private String myname;
     private String username;
-    private String ip;
-    private Map<String,String> ipMap;
-    private Map<String,JFrame> jFrameMap;
-
-    DatagramSocket receive;
-    DatagramPacket packet;
+    private List<String> list;
+    private Map<String,List<String>> userMap;
+    private Map<String, MyFrame> jFrameMap;
     DatagramSocket send;
 
-    public ClientFrame(String myname,String username, String ip, Map<String,String> ipMap,Map<String,JFrame> jFrameMap) throws SocketException {
-        this.high = 500;
-        this.wide = 400;
+    public ClientFrame(String myname, String username, List<String> list, Map<String,List<String>> userMap, Map<String, MyFrame> jFrameMap) throws SocketException {
+        super(username);
         this.myname = myname;
         this.username = username;
-        this.ip = ip;
-        this.ipMap = ipMap;
+        this.list = list;
+        this.userMap = userMap;
         this.jFrameMap = jFrameMap;
-
-        this.receive = new DatagramSocket(9090);
-        byte[] buf = new byte[1024];
-        this.packet = new DatagramPacket(buf, buf.length);
-
         this.send = new DatagramSocket();
-        getFrame();
     }
 
-    private void getFrame(){
-        this.setName(username);
-        this.setLayout(null);
-        this.setBounds(300,200,wide,high);
-        this.setSize(wide, high);
-        this.setResizable(false);
-        Container c = this.getContentPane();
-
-        inputBox = new JTextArea();
-        inputBox.setLineWrap(true);
-        JScrollPane s1 = new JScrollPane(inputBox);
-        s1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        s1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        s1.setBounds(4, 2, wide-12, high*5/10);
-
-        outputBox = new JTextArea();
-        outputBox.setLineWrap(true);
-        JScrollPane s2 = new JScrollPane(outputBox);
-        s2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        s2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        s2.setBounds(4, high*5/10+4, wide-12, high*3/10);
-
-        out = new JButton("发送");
-        out.setBounds(4, high*8/10+6, 100, high*1/10);
-
-        c.add(s1);
-        c.add(s2);
-        c.add(out);
-
-        new Thread(() -> {
-            while(ipMap.containsKey(username)) {
-                try {
-                    receive.receive(packet);
-                    String[] ss = new String(packet.getData(), 0, packet.getLength()).split(":");
-                    if(ss[0].equals(username)){
-                        inputBox.append(ss[0]+":"+ss[1]);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            inputBox.append(username+"不在线");
-        }).start();
-
+    @Override
+    public void listen(JTextArea outputBox, JButton out) {
         out.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(ipMap.containsKey(username)) {
+                if(userMap.containsKey(username)) {
                     String s = outputBox.getText();
                     try {
                         byte[] message = (myname + ":" + s).getBytes();
-                        InetAddress address = InetAddress.getByName(ip);
-                        DatagramPacket packet = new DatagramPacket(message, message.length, address, 9090);
+                        InetAddress address = InetAddress.getByName(list.get(0));
+                        DatagramPacket packet = new DatagramPacket(message, message.length, address,Integer.parseInt(list.get(1)));
                         send.send(packet);
-                        inputBox.append(myname + ":" + s + "\r\n");
-
+                        jFrameMap.get(username).getInputBox().append(myname + ":" + s + "\r\n");
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                     }
                     outputBox.setText("");
                 }else {
-                    inputBox.append(username+"不在线");
+                    jFrameMap.get(username).getInputBox().append(username+"不在线");
                 }
             }
         });
@@ -120,5 +62,10 @@ public class ClientFrame extends JFrame {
             }
         });
         this.setVisible(true);
+    }
+
+    @Override
+    public JTextArea getInputBox() {
+        return super.getInputBox();
     }
 }
