@@ -23,20 +23,24 @@ public class SocketInteractiveThread implements Runnable{
 
     @Override
     public void run() {
-        while(true){
+        boolean flag = true;
+        while(flag){
             try {
                 String message = getMessage();
-                System.out.println(message);
                 String[] msgs = message.split(":",2);
                 if(msgs[0].equals("lunch")){
                     UserUtil.addUser(msgs[1],userMap);
+                    FrameUtil.getGroupFrame(name,printWriter,groupChatMap).getInputBox().append(msgs[1].split("&")[0]+"上线了\r\n");
                 }else if(msgs[0].equals("quit")){
                     UserUtil.deleteUser(msgs[1],userMap);
+                    FrameUtil.getGroupFrame(name,printWriter,groupChatMap).getInputBox().append(msgs[1]+"下线了\r\n");
                 }else if(msgs[0].equals("message")){
                     FrameUtil.getGroupFrame(name,printWriter,groupChatMap).getInputBox().append(msgs[1]+"\r\n");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("与服务器连接异常");
+                flag = false;
+                System.exit(0);
             }
         }
     }

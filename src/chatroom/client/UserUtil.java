@@ -11,16 +11,12 @@ public class UserUtil {
         for(int i = 1;i<ss.length;i++){
             userList.add(ss[i]);
         }
-        System.out.println(ss[0]+"上线");
         userMap.put(ss[0],userList);
     }
 
     public static void deleteUser(String msg, Map<String, List<String>> userMap){
-        System.out.println(msg+"下线了");
         if(userMap.containsKey(msg)){
             userMap.remove(msg);
-        }else{
-            System.out.println("用户原本 不在线");
         }
     }
 }

@@ -69,13 +69,19 @@ public class ClientThread implements Runnable{
         new Thread(new SocketInteractiveThread(name,userMap,groupChatMap,bufferedReader,printWriter)).start();
         new Thread(new DatagramSocketInteractiveThread(name,datagramSocket,packet,userMap,privateChatMap)).start();
 
-        boolean flag = true;
         Scanner scanner = new Scanner(System.in);
-        while(flag){
+
+        while(true){
             System.out.print("请输入聊天对象：");
             String username = scanner.nextLine();
             if(username.equals("quit")){
-                flag = false;
+                try {
+                    datagramSocket.close();
+                    socket.close();
+                    System.exit(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }else if(username.equals("群聊")){
                 FrameUtil.getGroupFrame(name,printWriter,groupChatMap);
             }else{
@@ -85,14 +91,6 @@ public class ClientThread implements Runnable{
                     e.printStackTrace();
                 }
             }
-        }
-        try {
-            datagramSocket.close();
-            bufferedReader.close();
-            printWriter.close();
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

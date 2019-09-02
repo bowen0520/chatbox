@@ -23,14 +23,17 @@ public class DatagramSocketInteractiveThread implements Runnable {
 
     @Override
     public void run() {
-        while(true) {
+        boolean flag = true;
+        while(flag) {
             try {
                 datagramSocket.receive(packet);
                 String msgs = new String(packet.getData(), 0, packet.getLength());
                 String getname = msgs.split(":", 2)[0];
                 FrameUtil.getPrivateFrame(name,getname,userMap,privateChatMap).getInputBox().append(msgs+"\r\n");
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("客户端端口异常");
+                flag = false;
+                System.exit(0);
             }
         }
     }

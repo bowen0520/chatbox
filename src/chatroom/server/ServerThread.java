@@ -18,9 +18,6 @@ public class ServerThread implements Runnable{
     //所有连接的用户的信息 用户名：ip：：ports
     private Map<String,List<String>> userMap;
 
-    //判断是否在线
-    private boolean flag = true;
-
     public ServerThread(String name, MySocket mySocket, Map<String, MySocket> socketMap,Map<String, List<String>> userMap) {
         this.name = name;
         this.mySocket = mySocket;
@@ -32,21 +29,22 @@ public class ServerThread implements Runnable{
     public void run() {
         System.out.println(name+"上线了");
         mySocket.sendMessage(getUsersMsg(userMap));
-        while(mySocket.isConnected()&&flag){
+        boolean flag = true;
+        while(flag){
             try {
                 String message = mySocket.getMessage();
                 Server.sendAll(name,"message"+":"+message);
                 System.out.println(message);
-            } catch (IOException e) {
-                flag = false;
+            } catch (Exception e) {
                 System.out.println(name+"断开连接");
+                Server.quitRemind(name);
+                try {
+                    mySocket.close();
+                } catch (IOException ex) {
+                    System.out.println("关闭socket");
+                }
+                flag = false;
             }
-        }
-        try {
-            Server.quitRemind(name);
-            mySocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -63,6 +61,7 @@ public class ServerThread implements Runnable{
                 message.append("\r\n");
             }
         }
-        return message.toString()+"end";
+        String msg = message.toString();
+        return msg.equals("")?msg:msg.substring(0,msg.lastIndexOf("\r\n"));
     }
 }

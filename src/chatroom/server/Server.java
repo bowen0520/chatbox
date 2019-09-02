@@ -71,7 +71,6 @@ public class Server {
         for(String s:list){
             stringBuilder.append("&"+s);
         }
-        System.out.println(stringBuilder.toString());
         return stringBuilder.toString();
     }
 

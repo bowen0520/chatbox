@@ -58,10 +58,9 @@ public class ClientFrame extends MyFrame {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                jFrameMap.get(username).setVisible(false);
                 jFrameMap.remove(username);
-                System.exit(0);
             }
         });
-        this.setVisible(true);
     }
 }

@@ -40,8 +40,8 @@ public class GroupChat extends MyFrame{
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                groupChatMap.get(username).setVisible(false);
                 groupChatMap.remove(username);
-                System.exit(0);
             }
         });
     }
