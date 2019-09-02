@@ -1,4 +1,4 @@
-package chatroom;
+package chatroom.client;
 
 import java.io.IOException;
 import java.util.Scanner;

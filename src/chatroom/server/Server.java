@@ -1,4 +1,4 @@
-package chatroom;
+package chatroom.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,20 +6,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Server {
     //用于接受用户信息并根据信息执行相应操作
     private ServerSocket serverSocket;
 
     //用于存储与其他用户交互的socket
-    private Map<String, MySocket> socketMap;
+    private static Map<String, MySocket> socketMap;
 
     //用于存储在线用户的信息  用户名：ip+ports
-    private Map<String, List<String>> userMap;
+    private static Map<String, List<String>> userMap;
 
     public Server() throws IOException {
         this.serverSocket = new ServerSocket(8990);
@@ -45,6 +42,7 @@ public class Server {
                     MySocket mySocket = new MySocket(accept,bufferedReader,printWriter);
                     socketMap.put(username, mySocket);
                     userMap.put(username,list);
+                    this.sendAll(username,lunchRemind(username,list));
                     new Thread(new ServerThread(username,mySocket,socketMap,userMap)).start();
                 }
             }catch (IOException e){
@@ -55,5 +53,32 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
         new Server().run();
+    }
+
+    public static void sendAll(String name ,String message) {
+        Iterator<Map.Entry<String, MySocket>> iterator = socketMap.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry<String, MySocket> next = iterator.next();
+            if(!next.getKey().equals(name)){
+                next.getValue().sendMessage(message);
+            }
+        }
+    }
+
+    public String lunchRemind(String name,List<String> list) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("lunch"+":"+name);
+        for(String s:list){
+            stringBuilder.append("&"+s);
+        }
+        System.out.println(stringBuilder.toString());
+        return stringBuilder.toString();
+    }
+
+    public static void quitRemind(String name) {
+        String message = "quit"+":"+name;
+        userMap.remove(name);
+        socketMap.remove(name);
+        sendAll(name,message);
     }
 }

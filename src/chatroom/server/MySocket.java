@@ -1,4 +1,4 @@
-package chatroom;
+package chatroom.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class MySocket {
         return stringBuffer.toString();
     }
 
-    public void sendMessage(String message) throws IOException {
+    public void sendMessage(String message) {
         printWriter.println(message+"\r\n"+"end");
     }
 

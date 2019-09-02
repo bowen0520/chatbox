@@ -1,4 +1,4 @@
-package chatroom;
+package chatroom.server;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -31,54 +31,22 @@ public class ServerThread implements Runnable{
     @Override
     public void run() {
         System.out.println(name+"上线了");
-        try {
-            lunchRemind();
-            mySocket.sendMessage(getUsersMsg(userMap));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mySocket.sendMessage(getUsersMsg(userMap));
         while(mySocket.isConnected()&&flag){
             try {
                 String message = mySocket.getMessage();
-                sendAll("message"+":"+message);
+                Server.sendAll(name,"message"+":"+message);
                 System.out.println(message);
             } catch (IOException e) {
                 flag = false;
                 System.out.println(name+"断开连接");
             }
         }
-        userMap.remove(name);
-        socketMap.remove(name);
         try {
-            quitRemind();
+            Server.quitRemind(name);
             mySocket.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public void lunchRemind() throws IOException {
-        List<String> list = userMap.get(name);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("lunch"+":"+name);
-        for(String s:list){
-            stringBuilder.append("&"+s);
-        }
-        sendAll(stringBuilder.toString());
-    }
-
-    public void quitRemind() throws IOException {
-        String message = "quit"+":"+name;
-        sendAll(message);
-    }
-
-    public void sendAll(String message) throws IOException {
-        Iterator<Map.Entry<String, MySocket>> iterator = socketMap.entrySet().iterator();
-        while(iterator.hasNext()){
-            Map.Entry<String, MySocket> next = iterator.next();
-            if(!next.getKey().equals(name)){
-                next.getValue().sendMessage(message);
-            }
         }
     }
 

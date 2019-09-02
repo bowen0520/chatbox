@@ -1,4 +1,4 @@
-package chatroom;
+package chatroom.client;
 
 import javax.swing.JTextArea;
 import javax.swing.JButton;
@@ -33,7 +33,7 @@ public class ClientFrame extends MyFrame {
     }
 
     @Override
-    public void listen(JTextArea outputBox, JButton out) {
+    public void setEvent(JTextArea outputBox, JButton out, JTextArea inputBox) {
         out.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -44,13 +44,14 @@ public class ClientFrame extends MyFrame {
                         InetAddress address = InetAddress.getByName(list.get(0));
                         DatagramPacket packet = new DatagramPacket(message, message.length, address,Integer.parseInt(list.get(1)));
                         send.send(packet);
-                        jFrameMap.get(username).getInputBox().append(myname + ":" + s + "\r\n");
+                        inputBox.append(myname + ":" + s + "\r\n");
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                     }
                     outputBox.setText("");
+                    outputBox.requestFocus();
                 }else {
-                    jFrameMap.get(username).getInputBox().append(username+"不在线");
+                    inputBox.append(username+"不在线");
                 }
             }
         });
@@ -62,10 +63,5 @@ public class ClientFrame extends MyFrame {
             }
         });
         this.setVisible(true);
-    }
-
-    @Override
-    public JTextArea getInputBox() {
-        return super.getInputBox();
     }
 }

@@ -1,6 +1,6 @@
 package test;
 
-import chatroom.ClientLunch;
+import chatroom.client.ClientLunch;
 
 import java.io.IOException;
 

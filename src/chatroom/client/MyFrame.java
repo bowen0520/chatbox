@@ -1,16 +1,10 @@
-package chatroom;
+package chatroom.client;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import java.awt.Container;
 
 public abstract class MyFrame extends JFrame{
 
@@ -42,7 +36,7 @@ public abstract class MyFrame extends JFrame{
     }
 
     private void getFrame(){
-        this.setName(username);
+        this.setTitle(username);
         this.setLayout(null);
         this.setBounds(300,200,wide,high);
         this.setSize(wide, high);
@@ -51,6 +45,7 @@ public abstract class MyFrame extends JFrame{
 
         inputBox = new JTextArea();
         inputBox.setLineWrap(true);
+        inputBox.setEditable(false);
         JScrollPane s1 = new JScrollPane(inputBox);
         s1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         s1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -70,7 +65,7 @@ public abstract class MyFrame extends JFrame{
         c.add(s2);
         c.add(out);
         this.setVisible(true);
-        listen(outputBox,out);
+        setEvent(outputBox,out,inputBox);
     }
-    public abstract void listen(JTextArea outputBox,JButton out);
+    public abstract void setEvent(JTextArea outputBox,JButton out,JTextArea inputBox);
 }
