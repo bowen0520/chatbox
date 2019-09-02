@@ -33,17 +33,23 @@ public class Server {
                     PrintWriter printWriter = new PrintWriter(accept.getOutputStream(),true);
                     String[] message = bufferedReader.readLine().split("&");
                     String username = message[0];
-                    List<String> list = new ArrayList<>();
-                    String ip = accept.getInetAddress().getHostAddress();
-                    list.add(ip);
-                    for(int i = 1;i<message.length;i++){
-                        list.add(message[i]);
+                    if(socketMap.containsKey(username)){
+                        printWriter.println("用户存在");
+                        accept.close();
+                    }else{
+                        printWriter.println("用户不存在");
+                        List<String> list = new ArrayList<>();
+                        String ip = accept.getInetAddress().getHostAddress();
+                        list.add(ip);
+                        for(int i = 1;i<message.length;i++){
+                            list.add(message[i]);
+                        }
+                        MySocket mySocket = new MySocket(accept,bufferedReader,printWriter);
+                        socketMap.put(username, mySocket);
+                        userMap.put(username,list);
+                        this.sendAll(username,lunchRemind(username,list));
+                        new Thread(new ServerThread(username,mySocket,socketMap,userMap)).start();
                     }
-                    MySocket mySocket = new MySocket(accept,bufferedReader,printWriter);
-                    socketMap.put(username, mySocket);
-                    userMap.put(username,list);
-                    this.sendAll(username,lunchRemind(username,list));
-                    new Thread(new ServerThread(username,mySocket,socketMap,userMap)).start();
                 }
             }catch (IOException e){
                 e.getStackTrace();

@@ -56,8 +56,14 @@ public class ClientThread implements Runnable{
     @Override
     public void run() {
         printWriter.println(name+"&"+ports[0]);
-        String str = "";
         try {
+            String str = bufferedReader.readLine();
+            if("用户存在".equals(str)){
+                datagramSocket.close();
+                socket.close();
+                System.out.println("用户存在");
+                return ;
+            }
             while (!(str = bufferedReader.readLine()).equals("end")) {
                 UserUtil.addUser(str,userMap);
             }
